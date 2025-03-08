@@ -1,7 +1,9 @@
 package bot
 
 import (
+	"go.mau.fi/whatsmeow/types"
 	"log"
+	"strings"
 
 	"go.mau.fi/whatsmeow/types/events"
 )
@@ -15,15 +17,25 @@ func (b *Bot) eventHandler(evt interface{}) {
 }
 
 func (b *Bot) handleMessage(msgEvt *events.Message) {
-	if msgEvt.Info.IsGroup {
+	if msgEvt.Info.IsGroup || msgEvt.Info.IsFromMe || msgEvt.Info.IsIncomingBroadcast() {
+		return
+	}
+
+	if msgEvt.Info.Edit == types.EditAttributeSenderRevoke {
 		return
 	}
 
 	sender := msgEvt.Info.Sender
-	if sender == b.LoggedInJID || sender == b.ForwardToJID {
+	if strings.Contains(sender.Server, "newsletter") {
+		return
+	}
+
+	if sender == b.ForwardToJID {
 		return
 	}
 	text := extractText(msgEvt)
+
+	//if msgEvt.Info.Type ==
 
 	// Collect contact name info
 	contactName := ""
